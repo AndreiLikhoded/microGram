@@ -1,6 +1,8 @@
 package com.example.microGram.dao;
 
 import com.example.microGram.entity.User;
+import com.example.microGram.work51.DataBaseConnectivity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
@@ -8,14 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class UserDao {
-    private static int PEOPLE_COUNT;
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/first_db";
+    private static final String URL = "jdbc:postgresql://localhost:5432/microGram";
     private static final String USERNAME = "postgres";
     private static final String PASSWORD = "postgres";
 
     private static Connection connection;
+
+    private final DataBaseConnectivity dbService;
 
     static{
         try{
@@ -70,7 +74,7 @@ public class UserDao {
             user = new User("","",0, 0, "", 0);
 
             user.setId(resultSet.getInt("id"));
-            user.setAccountName(resultSet.getString("name"));
+            user.setAccountName(resultSet.getString("accountName"));
             user.setEmail(resultSet.getString("email"));
             user.setAge(resultSet.getInt("age"));
         } catch (SQLException throwables) {
@@ -85,7 +89,7 @@ public class UserDao {
             PreparedStatement preparedStatement =
                     connection.prepareStatement("INSERT INTO User VALUES(1, ?, ?, ?)");
 
-            PreparedStatement.setString(1, user.getAccountName());
+            preparedStatement.setString(1, user.getAccountName());
             preparedStatement.setInt(2, user.getAge());
             preparedStatement.setString(3, user.getEmail());
 
@@ -102,7 +106,7 @@ public class UserDao {
             PreparedStatement preparedStatement =
                     connection.prepareStatement("UPDATE User SET accountName=?, age=?, email=? WHERE id=?");
 
-            PreparedStatement.setString(1, updateUser.getAccountName());
+            preparedStatement.setString(1, updateUser.getAccountName());
             preparedStatement.setInt(2, updateUser.getAge());
             preparedStatement.setString(3, updateUser.getEmail());
             preparedStatement.setInt(4, id);
@@ -113,16 +117,26 @@ public class UserDao {
         }
     }
 
-    public void delete(int id){
+    public User checkProfile(String profile) {
         try {
-            PreparedStatement preparedStatement =
-                    connection.prepareStatement("DELETE FROM User WHERE id=?");
-            PreparedStatement.setInt(1, id);
+            String SQL = "SELECT * FROM microgram " + "WHERE profile =?";
+            PreparedStatement statement = dbService.getConnection().prepareStatement(SQL);
+            statement.setString(1, profile);
 
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (statement.execute()) {
+                ResultSet resultSet = statement.getResultSet();
+                resultSet.next();
+
+                User user = new User();
+
+                user.setAccountName(resultSet.getString("name"));
+                user.setEmail(resultSet.getString("email"));
+                return user;
+            } else {
+                throw new SQLException();
+            }
+        }catch (SQLException e) {
+            return null;
         }
-
     }
 }

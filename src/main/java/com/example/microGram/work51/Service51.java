@@ -1,5 +1,7 @@
 package com.example.microGram.work51;
 
+import com.example.microGram.dao.UserDao;
+import com.example.microGram.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import java.sql.*;
 public class Service51 {
 
     private final DataBaseConnectivity dbService;
+    private final UserDao userDao;
 
     private int executeUpdate(String query)throws SQLException {
         Statement statement = dbService.getConn().createStatement();
@@ -74,5 +77,9 @@ public class Service51 {
         resultSet.updateInt("age", 18);
         resultSet.insertRow();
         resultSet.moveToCurrentRow();
+    }
+
+    public void create(User user) {
+        userDao.save(user);
     }
 }

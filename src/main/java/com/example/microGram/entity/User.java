@@ -1,6 +1,7 @@
 package com.example.microGram.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
@@ -21,6 +22,5 @@ public class User {
         this.counter = counter;
     }
 
-    public void add(User user) {
-    }
+
 }

@@ -42,4 +42,9 @@ public class DataBaseConnectivity {
             return e.getMessage();
         }
     }
+
+    public Connection getConnection() throws SQLException {
+        String url = "jdbc:postgresql://localhost:5432/postgres?user=postgres&password=qwerty";
+        return DriverManager.getConnection(url);
+    }
 }
